@@ -35,6 +35,7 @@ public:
   virtual void      OnRender();
   virtual void      GoEast();
   virtual void      GoWest();
+  virtual void      GoSouth();
   virtual void      GoNorth();
   virtual void      SetNotAlive();
   virtual bool      IsAlive();
