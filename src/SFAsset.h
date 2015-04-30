@@ -33,7 +33,6 @@ public:
   virtual Point2    GetPosition();
   virtual SFAssetId GetId();
   virtual void      OnRender();
-  virtual void      Fly();
   virtual void      WiggleTime();
   virtual void      GoEast();
   virtual void      GoWest();

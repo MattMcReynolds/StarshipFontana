@@ -13,7 +13,7 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
   for(int i=0; i<number_of_aliens; i++) {
     // place an alien at width/number_of_aliens * i
     auto alien = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
-    auto pos   = Point2(((canvas_w/number_of_aliens) * i)+60.0f, 600.0f);
+    auto pos   = Point2(((canvas_w/number_of_aliens) * i)+60.0f, 550.0f);
     alien->SetPosition(pos);
     aliens.push_back(alien);
   }
@@ -125,7 +125,7 @@ void SFApp::OnUpdateWorld() {
   for(auto a : aliens) {
     for(auto s : bases) {
       if(a->CollidesWith(s)) {
-        cout << "An enemy plane reached your base!" << endl;
+        cout << "An enemy plane reached your base! You lose." << endl;
 	a->HandleCollision();
       }
     }
@@ -133,7 +133,7 @@ void SFApp::OnUpdateWorld() {
     for(auto a : aliens) {
       if(player->CollidesWith(a)) {
 	a->HandleCollision();
-        cout << "Enemy crashed into you!" << endl;
+        cout << "Enemy crashed into you! You lose." << endl;
       }
   }
   

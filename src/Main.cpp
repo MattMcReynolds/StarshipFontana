@@ -75,7 +75,7 @@ int main(int arc, char ** argv) {
   // Call the function "display" every delay milliseconds
   int delay = 1000/60; // 1000 milis in a second, divide by 60 - the framerate
   SDL_AddTimer(delay, PushUpdateEvent, NULL);
-
+  cout << "You win when all the planes and pigeons are destroyed, don't get hit and don't let them get into your base. Good luck." << endl;
   // Start game loop
   sfapp->OnExecute();
 

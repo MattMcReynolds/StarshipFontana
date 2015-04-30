@@ -110,8 +110,7 @@ void SFApp::OnUpdateWorld() {
   for(auto p : projectiles) {
     for(auto c : coins) {
       if(p->CollidesWith(c)) {
-        c->HandleCollision();
-	cout << "BLEURGHHH! You got the pigeon." << endl;// pigeons don't destroy bullets
+        c->HandleCollision();// pigeons don't destroy bullets
       }
     }
   }
@@ -125,7 +124,7 @@ void SFApp::OnUpdateWorld() {
   for(auto a : aliens) {
     for(auto s : bases) {
       if(a->CollidesWith(s)) {
-        cout << "An enemy plane reached your base!" << endl;
+        cout << "An enemy plane reached your base! You lose." << endl;
 	a->HandleCollision();
       }
     }
@@ -133,7 +132,7 @@ void SFApp::OnUpdateWorld() {
     for(auto a : aliens) {
       if(player->CollidesWith(a)) {
 	a->HandleCollision();
-        cout << "Enemy crashed into you!" << endl;
+        cout << "Enemy crashed into you! You lose." << endl;
       }
   }
   

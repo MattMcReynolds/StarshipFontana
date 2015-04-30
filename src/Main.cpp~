@@ -35,7 +35,7 @@ SFError InitGraphics() {
   }
 
   // Create a new window
-  g_window = SDL_CreateWindow("StarShip Fontana"
+  g_window = SDL_CreateWindow("Airplane Fontana"
                             , SDL_WINDOWPOS_CENTERED
                             , SDL_WINDOWPOS_CENTERED
                             , width

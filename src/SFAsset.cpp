@@ -117,20 +117,6 @@ void SFAsset::WiggleTime() {
   }
 }
 
-void SFAsset::Fly() {
-  int w, h;
-  SDL_GetRendererOutputSize(sf_window->getRenderer(), &w, &h);
-  Vector2 c = *(bbox->centre) + Vector2(1.0f, 1.0f);
-  if(!(c.getX()+75.0f > w)) {
-    bbox->centre.reset();
-    bbox->centre = make_shared<Vector2>(c);
-  }
-   if(!(c.getY() > h)) {
-    bbox->centre.reset();
-    bbox->centre = make_shared<Vector2>(c);
-  }
-}
-
 void SFAsset::GoWest() {
   Vector2 c = *(bbox->centre) + Vector2(-5.0f, 0.0f);
   if(!(c.getX()-30.0f < 0)) {
@@ -205,7 +191,11 @@ bool SFAsset::IsAlive() {
 }
 
 void SFAsset::HandleCollision() {
-  if(SFASSET_PROJECTILE == type || SFASSET_ALIEN == type || SFASSET_COIN == type) {
+  if(SFASSET_PROJECTILE == type || SFASSET_ALIEN == type) {
     SetNotAlive();
+  }
+  if(SFASSET_COIN == type) {
+    SetNotAlive();
+    cout << "BLEURGHHH! You got the pigeon." << endl;
   }
 }
