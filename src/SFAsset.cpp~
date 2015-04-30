@@ -181,7 +181,7 @@ void SFAsset::GoSouth() {
 }
 
 void SFAsset::GoSouthSlow() {
-  Vector2 c = *(bbox->centre) + Vector2(0.0f, -1.3f);
+  Vector2 c = *(bbox->centre) + Vector2(0.0f, -2.0f);
   if(!(c.getY() < 0)) {
     bbox->centre.reset();
     bbox->centre = make_shared<Vector2>(c);

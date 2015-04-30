@@ -6,32 +6,22 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
 
   app_box = make_shared<SFBoundingBox>(Vector2(canvas_w, canvas_h), canvas_w, canvas_h);
   player  = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
-  auto player_pos = Point2(canvas_w/2, 50);
+  auto player_pos = Point2(canvas_w/2, 22);
   player->SetPosition(player_pos);
 
   const int number_of_aliens = 5;
   for(int i=0; i<number_of_aliens; i++) {
     // place an alien at width/number_of_aliens * i
     auto alien = make_shared<SFAsset>(SFASSET_ALIEN, sf_window);
-    auto pos   = Point2(((canvas_w/number_of_aliens) * i)+60.0f, 550.0f);
+    auto pos   = Point2(((canvas_w/number_of_aliens) * i)+60.0f, 300.0f);
     alien->SetPosition(pos);
     aliens.push_back(alien);
   }
 
   auto coin = make_shared<SFAsset>(SFASSET_COIN, sf_window);
-  auto pos  = Point2(canvas_w/2, 400);
+  auto pos  = Point2((canvas_w/4), 100);
   coin->SetPosition(pos);
   coins.push_back(coin);
-
-auto bar = make_shared<SFAsset>(SFASSET_BAR, sf_window);
-  pos  = Point2((canvas_w/2), (canvas_h-10));
-  bar->SetPosition(pos);
-  bars.push_back(bar);
-
-auto base = make_shared<SFAsset>(SFASSET_BASE, sf_window);
-  pos  = Point2((canvas_w/2), 10);
-  base->SetPosition(pos);
-  bases.push_back(base);
 }
 
 SFApp::~SFApp() {
@@ -51,6 +41,22 @@ void SFApp::OnEvent(SFEvent& event) {
     OnUpdateWorld();
     OnRender();
     break;
+  case SFEVENT_PLAYER_LEFT:
+    player->GoWest();
+    break;
+  case SFEVENT_PLAYER_RIGHT:
+    player->GoEast();
+    break;
+  case SFEVENT_PLAYER_UP:
+    player->GoNorth();
+    break;
+  case SFEVENT_PLAYER_DOWN:
+    player->GoSouth();
+    break;
+  case SFEVENT_FIRE:
+    fire ++;
+    FireProjectile();
+    break;
   }
 }
 
@@ -66,75 +72,36 @@ int SFApp::OnExecute() {
 }
 
 void SFApp::OnUpdateWorld() {
-  //Receive keyboard inputs simultaneously
-  const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
-  if(keyboardState[SDL_SCANCODE_DOWN]) {
-    player->GoSouth();
-  }
-  if(keyboardState[SDL_SCANCODE_UP]) {
-    player->GoNorth();
-  }
-  if(keyboardState[SDL_SCANCODE_LEFT]) {
-    player->GoWest();
-  }
-  if(keyboardState[SDL_SCANCODE_RIGHT]) {
-    player->GoEast();
-  }
-  if(keyboardState[SDL_SCANCODE_SPACE]) {
-    FireProjectile();
-  }
   // Update projectile positions
   for(auto p: projectiles) {
-    p->BulletNorth();
+    p->GoNorth();
   }
 
   for(auto c: coins) {
-    c->WiggleTime();
+    c->GoEast();
   }
 
   // Update enemy positions
   for(auto a : aliens) {
-    a->GoSouthSlow();
+    a->WiggleLeft();
   }
 
   // Detect collisions
   for(auto p : projectiles) {
     for(auto a : aliens) {
       if(p->CollidesWith(a)) {
+        p->HandleCollision();
         a->HandleCollision();
-	p->HandleCollision();
-	cout << "Enemy down." << endl;// enemy planes destroy bullets
       }
     }
   }
   for(auto p : projectiles) {
     for(auto c : coins) {
       if(p->CollidesWith(c)) {
-        c->HandleCollision();
-	cout << "BLEURGHHH! You got the pigeon." << endl;// pigeons don't destroy bullets
-      }
-    }
-  }
-  for(auto p : projectiles) {
-    for(auto b : bars) {
-      if(p->CollidesWith(b)) {
         p->HandleCollision();
+        c->HandleCollision();
       }
     }
-  }
-  for(auto a : aliens) {
-    for(auto s : bases) {
-      if(a->CollidesWith(s)) {
-        cout << "An enemy plane reached your base!" << endl;
-	a->HandleCollision();
-      }
-    }
-  }
-    for(auto a : aliens) {
-      if(player->CollidesWith(a)) {
-	a->HandleCollision();
-        cout << "Enemy crashed into you!" << endl;
-      }
   }
   
   // remove dead aliens (the long way)
@@ -146,24 +113,6 @@ void SFApp::OnUpdateWorld() {
   }
   aliens.clear();
   aliens = list<shared_ptr<SFAsset>>(tmp);
-  // remove dead coins (pigeon)
-  list<shared_ptr<SFAsset>> tmp2;
-  for(auto c : coins) {
-    if(c->IsAlive()) {
-      tmp2.push_back(c);
-    }
-  }
-  coins.clear();
-  coins = list<shared_ptr<SFAsset>>(tmp2);
-  // remove destroyed bullets
-  list<shared_ptr<SFAsset>> tmp3;
-  for(auto p : projectiles) {
-    if(p->IsAlive()) {
-      tmp3.push_back(p);
-    }
-  }
-  projectiles.clear();
-  projectiles = list<shared_ptr<SFAsset>>(tmp3);
 }
 
 void SFApp::OnRender() {
@@ -171,14 +120,6 @@ void SFApp::OnRender() {
 
   // draw the player
   player->OnRender();
-  
-  for(auto b: bars) {
-    if(b->IsAlive()) {b->OnRender();}
-  }
-
-  for(auto b: bases) {
-    if(b->IsAlive()) {b->OnRender();}
-  }
 
   for(auto p: projectiles) {
     if(p->IsAlive()) {p->OnRender();}
@@ -189,7 +130,7 @@ void SFApp::OnRender() {
   }
 
   for(auto c: coins) {
-    if(c->IsAlive()) {c->OnRender();}
+    c->OnRender();
   }
 
   // Switch the off-screen buffer to be on-screen
